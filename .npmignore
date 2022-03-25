@@ -9,3 +9,4 @@ src
 jest.config.js
 tsconfig.json
 package-lock.json
+.parcel-cache
