@@ -3,10 +3,16 @@ import { IToken, TUserdocks } from '@userdocks/web-client-sdk/dist/types';
 
 import refreshTokenOrPipeThrough from '../src/refreshTokenOrPipeThrough';
 
+const redirectFunc = jest.fn();
+
 jest.mock('@userdocks/web-client-sdk', () => async () => ({
   getToken: jest.fn().mockReturnValueOnce('new'),
-  silentRefresh: jest.fn().mockReturnValueOnce(true).mockReturnValueOnce(false),
-  redirectTo: jest.fn(),
+  silentRefresh: jest
+    .fn()
+    .mockReturnValueOnce(true)
+    .mockReturnValueOnce(false)
+    .mockRejectedValue(new Error()),
+  redirectTo: redirectFunc,
 }));
 
 let userdocks: TUserdocks;
@@ -41,12 +47,9 @@ describe('refreshTokenOrPipeThrough', () => {
       tokenType: 'Bearer',
     };
 
-    const returnedValue = await refreshTokenOrPipeThrough(
-      expectedValue as IToken,
-      userdocks
-    );
+    await refreshTokenOrPipeThrough(expectedValue as IToken, userdocks);
 
-    expect(returnedValue).toEqual(expectedValue);
+    expect(redirectFunc).toBeCalledTimes(1);
   });
   test('with 20000ms expiration time on token should pipe through', async () => {
     const expectedValue = {
@@ -62,5 +65,18 @@ describe('refreshTokenOrPipeThrough', () => {
     );
 
     expect(returnedValue).toBe(expectedValue);
+  });
+  test('with 0ms expiration time on token with unsuccessful refresh should redirect', async () => {
+    const expectedValue = {
+      expiresIn: 0,
+      idToken: '1.2.3',
+      accessToken: '1.2.3',
+      redirectUri: 'https://redirect',
+      tokenType: 'Bearer',
+    };
+
+    await refreshTokenOrPipeThrough(expectedValue as IToken, userdocks);
+
+    expect(redirectFunc).toBeCalledTimes(2);
   });
 });
