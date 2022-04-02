@@ -1,7 +1,6 @@
 .github
 coverage
 test
-src
 .eslintrc.js
 .gitignore
 .prettierrc
