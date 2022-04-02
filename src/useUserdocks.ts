@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import getUserdocks from '@userdocks/web-client-sdk';
 import { IOptions, TUserdocks } from '@userdocks/web-client-sdk/dist/types';
 
 import getNaiveCache from './getNaiveCache';
 import refreshOrPipeTokenThrough from './refreshTokenOrPipeThrough';
+import getIdentity from './getIdentity';
 
 interface IIdentity {
   clear: () => void;
@@ -11,12 +11,6 @@ interface IIdentity {
   userdocks: TUserdocks | null;
   isAuthenticated: boolean;
 }
-
-const getIdentity = async (options: IOptions) => {
-  const identity = await getUserdocks(options);
-
-  return identity;
-};
 
 const userdocksCache = getNaiveCache<TUserdocks>('userdocks');
 
