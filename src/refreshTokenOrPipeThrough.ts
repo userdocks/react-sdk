@@ -31,8 +31,6 @@ const refreshOrPipeTokenThrough = async (
 
     if (result) {
       thisToken = await userdocks.getToken();
-    } else {
-      userdocks.redirectTo('signIn');
     }
   }
 

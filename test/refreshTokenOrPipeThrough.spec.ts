@@ -22,7 +22,7 @@ beforeAll(async () => {
 });
 
 describe('refreshTokenOrPipeThrough', () => {
-  test('with zero expiration time on token and successful refresh should get new token', async () => {
+  test('with zero expiration time on token and successful refresh, it should get new token', async () => {
     const expectedValue = 'new';
 
     const returnedValue = await refreshTokenOrPipeThrough(
@@ -38,7 +38,7 @@ describe('refreshTokenOrPipeThrough', () => {
 
     expect(returnedValue).toBe(expectedValue);
   });
-  test('with zero expiration time on token and unsuccessful refresh should redirect', async () => {
+  test('with zero expiration time on token and unsuccessful refresh, it should pipe the old token through', async () => {
     const expectedValue = {
       expiresIn: 0,
       idToken: '1.2.3',
@@ -47,13 +47,16 @@ describe('refreshTokenOrPipeThrough', () => {
       tokenType: 'Bearer',
     };
 
-    await refreshTokenOrPipeThrough(expectedValue as IToken, userdocks);
+    const returnedValue = await refreshTokenOrPipeThrough(
+      expectedValue as IToken,
+      userdocks
+    );
 
-    expect(redirectFunc).toBeCalledTimes(1);
+    expect(returnedValue).toBe(expectedValue);
   });
-  test('with 20000ms expiration time on token should pipe through', async () => {
+  test('with zero expiration time and an unsuccessful refresh, due to a failed request, it should pipe the token through', async () => {
     const expectedValue = {
-      expiresIn: 20000,
+      expiresIn: 0,
       idToken: '1.2.3',
       accessToken: '1.2.3',
       redirectUri: 'https://redirect',
@@ -65,18 +68,5 @@ describe('refreshTokenOrPipeThrough', () => {
     );
 
     expect(returnedValue).toBe(expectedValue);
-  });
-  test('with 0ms expiration time on token with unsuccessful refresh should redirect', async () => {
-    const expectedValue = {
-      expiresIn: 0,
-      idToken: '1.2.3',
-      accessToken: '1.2.3',
-      redirectUri: 'https://redirect',
-      tokenType: 'Bearer',
-    };
-
-    await refreshTokenOrPipeThrough(expectedValue as IToken, userdocks);
-
-    expect(redirectFunc).toBeCalledTimes(2);
   });
 });
