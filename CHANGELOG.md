@@ -1,3 +1,7 @@
+0.2.1 - April, 02 2022
+
+* 095d47a Fix: no redirect (aichbauer)
+
 0.2.0 - April, 02 2022
 
 * a648a39 Test: add test for new feat (aichbauer)
