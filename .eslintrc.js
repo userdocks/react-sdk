@@ -4,13 +4,16 @@ module.exports = {
     es2021: true,
     jest: true,
   },
-  extends: ['airbnb-base'],
+  globals: {
+    JSX: true,
+  },
+  extends: ['airbnb-base', 'prettier'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 13,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint'],
+  plugins: ['@typescript-eslint', 'prettier'],
   settings: {
     'import/resolver': {
       node: {
@@ -20,14 +23,14 @@ module.exports = {
     },
   },
   rules: {
-    indent: ['error', 'off'],
-    'operator-linebreak': ['error', 'after'],
+    'prettier/prettier': 'error',
     'import/extensions': [
       'error',
       'ignorePackages',
       {
         js: 'never',
         ts: 'never',
+        tsx: 'never',
       },
     ],
   },

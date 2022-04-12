@@ -24,19 +24,17 @@ npm i @userdocks/react-sdk
 
 Documentation of all the functions and methods this SDK exposes.
 
-## **useUserdocks**
-
-This custom hook returns an object.
-
-It can be used in function components.
+## **UserdocksProvider**
 
 **Syntax**
 
-Returns a promise that should resolve a new object.
+```jsx
+import { UserdocksProvider } from '@userdocks/react-sdk';
 
-```js
-const { isLoading, isAuthenticated, userdocks, clear } = await useUserdocks(
-  options
+render(
+  <UserdocksProvider options={options}>
+    {children}
+  </UserdocksProvider>
 );
 ```
 
@@ -52,6 +50,26 @@ const { isLoading, isAuthenticated, userdocks, clear } = await useUserdocks(
     - **origin** `<string>`: the uri of the client application (_required_)
     - **clientId** `<string>`: the UUID of an userdocks application (_required_)
     - **redirectUri** `<string>`: the redirect uri of the userdocks application (_required_)
+## **useUserdocks**
+
+This custom hook returns an object.
+
+It can be used in function components.
+
+**Syntax**
+
+This is a custom hook to get the current userdocks object from a UserdocksProvider.
+
+```js
+import { useUserdocks } from '@userdocks/react-sdk';
+
+function MyComponent() {
+  const { isLoading, isAuthenticated, userdocks } = useUserdocks();
+  console.log('Is user authenticated: ', isAuthenticated)
+
+  // ...
+}
+```
 
 **Return Value**
 
@@ -59,16 +77,13 @@ const { isLoading, isAuthenticated, userdocks, clear } = await useUserdocks(
   - **isLoading** `<boolean>`: indicating if userdocks is ready for usage
   - **isAuthenticated** `<boolean>`: indicating if the user is autheticated or not
   - **userdocks** `<object | null>`: an object holding the [@userdocks/web-client-sdk](https://github.com/userdocks/web-client-sdk#getuserdocks)
-  - **clear** `<function>`: a function to reset the identity object
 
 ## **Usage**
 
-Exchange the code to a token on your redirect uri:
+Wrap your app with a `UserdocksProvider`:
 
-```js
-import { useEffect, FC } from 'react';
-import { useHistory } from 'react-router-dom';
-import useUserdocks from '@userdocks/react-sdk';
+```jsx
+import { UserdocksProvider } from '@userdocks/react-sdk';
 
 const options = {
   app: {
@@ -78,17 +93,31 @@ const options = {
   },
 };
 
+render(
+  <UserdocksProvider options={options}>
+    <App />
+  </UserdocksProvider>
+);
+```
+
+Exchange the code to a token on your redirect uri:
+
+```jsx
+import { useEffect, FC } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useUserdocks } from '@userdocks/react-sdk';
+
 const Callback = () => {
-  const { loading, userdocks } = useUserdocks();
+  const { isLoading, userdocks } = useUserdocks();
   const history = useHistory();
 
   useEffect(() => {
     (async () => {
       try {
-        if (userdocks && !loading) {
+        if (userdocks && !isLoading) {
           const isLoginSuccess = await userdocks.exchangeCodeForToken();
           if (isLoginSuccess) {
-            history.push('/autheticated-component');
+            history.replace('/autheticated-component');
           } else {
             userdocks.redirectTo('signIn');
           }
@@ -102,7 +131,7 @@ const Callback = () => {
         // }
       }
     })();
-  }, [loading]);
+  }, [isLoading, userdocks]);
 
   return null;
 };
@@ -112,7 +141,7 @@ export default Callback;
 
 Check if a user is autheticated on any component:
 
-```js
+```jsx
 import { useEffect, FC } from 'react';
 import { useHistory } from 'react-router-dom';
 import useUserdocks from '@userdocks/react-sdk';
@@ -126,7 +155,7 @@ const options = {
 };
 
 const AnyComponent = () => {
-  const { loading, isAutheticated, userdocks } = useUserdocks();
+  const { isLoading, isAutheticated, userdocks } = useUserdocks();
   const history = useHistory();
 
   if (isLoading) {

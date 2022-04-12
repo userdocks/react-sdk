@@ -17,8 +17,9 @@ jobs:
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node }}
+          node-vexrsion: ${{ matrix.node }}
       - run: npm install
+      - run: npm run lint
       - run: npm test
       - name: Coveralls Parallel
         uses: coverallsapp/github-action@master
