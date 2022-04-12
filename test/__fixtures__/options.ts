@@ -1,7 +1,9 @@
-export const options = {
+const options = {
   app: {
     origin: 'origin',
     clientId: 'clientId',
     redirectUri: 'redirectUri',
   },
 };
+
+export default options;
