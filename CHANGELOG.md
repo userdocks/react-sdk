@@ -1,3 +1,8 @@
+0.3.0 - April, 12 2022
+
+* a35d0d1 Chore: better eslint and typescript (JPeer264)
+* a85f53b Feat: use provider instead of single hooks (JPeer264)
+
 0.2.1 - April, 02 2022
 
 * 095d47a Fix: no redirect (aichbauer)
