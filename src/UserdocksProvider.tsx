@@ -1,10 +1,9 @@
-import getUserdocks from '@userdocks/web-client-sdk';
-import { IOptions, TUserdocks } from '@userdocks/web-client-sdk/dist/types';
+import userdocksSdk, { IOptions } from '@userdocks/web-client-sdk';
 import { createContext, PropsWithChildren, useEffect, useState } from 'react';
 
 export interface IIdentity {
   isLoading: boolean;
-  userdocks: TUserdocks | null;
+  userdocks: typeof userdocksSdk | null;
   isAuthenticated: boolean;
 }
 
@@ -25,7 +24,7 @@ function UserdocksProvider({
   options,
 }: PropsWithChildren<UserdocksProviderProps>): JSX.Element | null {
   const [isLoading, setIsLoading] = useState(true);
-  const [userdocks, setUserdocks] = useState<TUserdocks | null>(null);
+  const [userdocks, setUserdocks] = useState<typeof userdocksSdk | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // initialize userdocks
@@ -37,10 +36,10 @@ function UserdocksProvider({
     setIsLoading(true);
 
     (async () => {
-      const userdocksClient = await getUserdocks(options);
-      const token = await userdocksClient.getToken({ refresh: true });
+      await userdocksSdk.initialize(options);
+      const token = await userdocksSdk.getToken({ refresh: true });
 
-      setUserdocks(userdocksClient);
+      setUserdocks(userdocksSdk);
       setIsAuthenticated(!!token?.expiresIn);
       setIsLoading(false);
     })();

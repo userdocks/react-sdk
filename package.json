@@ -10,10 +10,10 @@
   "scripts": {
     "lint": "eslint --ext .js,.ts,.tsx .",
     "test": "jest --coverage",
-    "build": "parcel build",
+    "build": "rm -rf dist && parcel build",
     "watch": "parcel watch",
     "cleanup": "rm -rf ./node_modules && rm -rf ./dist && rm -rf ./.parcel-cache && rm -rf ./.cache && npm i",
-    "prepublishOnly": "npm run cleanup && npm test && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "author": "userdocks",
   "license": "MIT",
@@ -38,7 +38,7 @@
     "@types/react": "17.0.2",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
     "@typescript-eslint/parser": "^5.9.0",
-    "@userdocks/web-client-sdk": "^0.4.0",
+    "@userdocks/web-client-sdk": "^0.5.2",
     "eslint": "^8.6.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
@@ -54,7 +54,7 @@
     "typescript": "^4.5.5"
   },
   "peerDependencies": {
-    "@userdocks/web-client-sdk": ">= 0.4.0",
+    "@userdocks/web-client-sdk": ">= 0.5.2",
     "react": ">= 16.8.0"
   }
 }
