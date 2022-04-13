@@ -1,3 +1,7 @@
+0.3.1 - April, 13 2022
+
+* 79bf5e1 Chore: update webclient-sdk (JPeer264)
+
 0.3.0 - April, 12 2022
 
 * a35d0d1 Chore: better eslint and typescript (JPeer264)
