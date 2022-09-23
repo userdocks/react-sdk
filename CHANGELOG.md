@@ -1,3 +1,7 @@
+0.3.2 - September, 23 2022
+
+* 99f787d Chore: remove optional chaining in build js files (JPeer264)
+
 0.3.1 - April, 13 2022
 
 * 79bf5e1 Chore: update webclient-sdk (JPeer264)
