@@ -1,3 +1,7 @@
+0.4.0 - September, 25 2022
+
+* c6298fd Feat: add selfhosted mode (JPeer264)
+
 0.3.2 - September, 23 2022
 
 * 99f787d Chore: remove optional chaining in build js files (JPeer264)
