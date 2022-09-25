@@ -41,6 +41,7 @@ render(
 **Parameters**
 
 - **options** `<object>`: an object holding two key value pairs
+  - **selfhosted** `<boolean | undefined>`: If you want to include the sdk into your bundle (_optional_). Default: `false`
   - **authServer** `<object | undefined>`: an object holding four key value pairs
     - **apiUri** `<string | undefined>`: the uri of the api of the authetication server (_optional_)
     - **domain** `<string | undefined>`: the domain of the authetication server (_optional_)

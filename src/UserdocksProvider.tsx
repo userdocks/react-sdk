@@ -8,7 +8,9 @@ export interface IIdentity {
 }
 
 interface UserdocksProviderProps {
-  options: IOptions;
+  options: IOptions & {
+    selfhosted?: boolean;
+  };
 }
 
 export const UserdocksContext = createContext<IIdentity>({
@@ -27,7 +29,15 @@ function UserdocksProvider({
   const [userdocks, setUserdocks] = useState<typeof userdocksSdk | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // initialize userdocks
+  const initializeUserdocks = async (userdocksObject: typeof userdocksSdk) => {
+    await userdocksObject.initialize(options);
+    const token = await userdocksObject.getToken({ refresh: true });
+
+    setUserdocks(userdocksObject);
+    setIsAuthenticated(!!token?.expiresIn);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     if (userdocks) {
       return;
@@ -35,15 +45,29 @@ function UserdocksProvider({
 
     setIsLoading(true);
 
-    (async () => {
-      await userdocksSdk.initialize(options);
-      const token = await userdocksSdk.getToken({ refresh: true });
+    if (options.selfhosted) {
+      initializeUserdocks(userdocksSdk);
 
-      setUserdocks(userdocksSdk);
-      setIsAuthenticated(!!token?.expiresIn);
-      setIsLoading(false);
-    })();
-  }, [userdocks]);
+      return;
+    }
+
+    const script = document.createElement('script');
+    const sdkUrl = options?.authServer?.sdkUri || 'https://sdk.userdocks.com';
+
+    script.type = 'text/javascript';
+    script.src = `${sdkUrl}/identity.js`;
+    script.async = true;
+
+    script.onload = async () => {
+      if (!window.userdocks) {
+        return;
+      }
+
+      initializeUserdocks(window.userdocks);
+    };
+
+    document.getElementsByTagName('head')[0].appendChild(script);
+  }, [options.selfhosted, userdocks]);
 
   if (!children) {
     return null;
