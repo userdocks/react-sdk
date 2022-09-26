@@ -4,7 +4,8 @@ import { createContext, PropsWithChildren, useEffect, useState } from 'react';
 export interface IIdentity {
   isLoading: boolean;
   userdocks: typeof userdocksSdk | null;
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | null;
+  authorize: () => Promise<void>;
 }
 
 interface UserdocksProviderProps {
@@ -14,9 +15,10 @@ interface UserdocksProviderProps {
 }
 
 export const UserdocksContext = createContext<IIdentity>({
-  isAuthenticated: false,
+  isAuthenticated: null,
   isLoading: true,
   userdocks: null,
+  authorize: () => Promise.resolve(),
 });
 
 export const UserdocksConsumer = UserdocksContext.Consumer;
@@ -25,17 +27,23 @@ function UserdocksProvider({
   children,
   options,
 }: PropsWithChildren<UserdocksProviderProps>): JSX.Element | null {
-  const [isLoading, setIsLoading] = useState(true);
   const [userdocks, setUserdocks] = useState<typeof userdocksSdk | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   const initializeUserdocks = async (userdocksObject: typeof userdocksSdk) => {
     await userdocksObject.initialize(options);
-    const token = await userdocksObject.getToken({ refresh: true });
 
     setUserdocks(userdocksObject);
+  };
+
+  const authorize = async () => {
+    if (!userdocks) {
+      return;
+    }
+
+    const token = await userdocks.getToken({ refresh: true });
+
     setIsAuthenticated(!!token?.expiresIn);
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -43,9 +51,9 @@ function UserdocksProvider({
       return;
     }
 
-    setIsLoading(true);
-
     if (options.selfhosted) {
+      // const userdocksObject = window.userdocks || userdocksSdk;
+
       initializeUserdocks(userdocksSdk);
 
       return;
@@ -75,7 +83,12 @@ function UserdocksProvider({
 
   return (
     <UserdocksContext.Provider
-      value={{ isLoading, userdocks, isAuthenticated }}
+      value={{
+        isLoading: !userdocks,
+        userdocks,
+        isAuthenticated,
+        authorize,
+      }}
     >
       {children}
     </UserdocksContext.Provider>
