@@ -1,3 +1,7 @@
+0.5.1 - October, 04 2022
+
+* 28c1f99 Docs: fix refreshToken to refreshType (aichbauer)
+
 0.5.0 - October, 04 2022
 
 * 6f0e6f8 Feat: finalize docs and rename variables (aichbauer)
