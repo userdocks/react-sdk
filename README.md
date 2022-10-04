@@ -101,7 +101,7 @@ const options = {
     sdkUri: '<the-payment-uri-of-your-application>',
   },
   app: {
-    refreshToken: '<refresh> or <silentRefresh>'
+    refreshType: '<refresh> or <silentRefresh>'
     origin: '<the-uri-of-your-application>',
     clientId: '<an-uuid-of-an-application-on-uderdocks>',
     redirectUri: '<the-redirect-uri-of-your-application>',
