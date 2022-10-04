@@ -1,3 +1,8 @@
+0.5.0 - October, 04 2022
+
+* 6f0e6f8 Feat: finalize docs and rename variables (aichbauer)
+* 0644c84 Feat: provider (JPeer264)
+
 0.4.0 - September, 25 2022
 
 * c6298fd Feat: add selfhosted mode (JPeer264)
