@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { act, renderHook } from '@testing-library/react-hooks';
 import userdocks from '@userdocks/web-client-sdk';
 import { mocked } from 'ts-jest/utils';
 import { UserdocksProvider, useUserdocks } from '../src';
@@ -52,6 +52,10 @@ describe('useUserdocks with zero expiration time on token', () => {
 
     await waitForNextUpdate();
 
+    await act(async () => {
+      await result.current.initializeToken();
+    });
+
     expect(result.current.isLoading).toBeFalsy();
     expect(result.current.isAuthenticated).toBeTruthy();
     expect(result.current.userdocks).toBeTruthy();
@@ -68,13 +72,18 @@ describe('useUserdocks with zero expiration time on token', () => {
       })
     );
 
-    const { result, waitForNextUpdate } = renderHook(useUserdocks, {
-      wrapper: ({ children }) => (
-        <UserdocksProvider options={options}>{children}</UserdocksProvider>
-      ),
-    });
+  const { result, waitForNextUpdate } = renderHook(useUserdocks, {
+    wrapper: ({ children }) => (
+      <UserdocksProvider options={options}>{children}</UserdocksProvider>
+    ),
+  });
 
-    await waitForNextUpdate();
+  await waitForNextUpdate();
+
+  await act(async () => {
+    await result.current.initializeToken();
+  });
+
 
     expect(result.current.isLoading).toBeFalsy();
     expect(result.current.isAuthenticated).toBeTruthy();

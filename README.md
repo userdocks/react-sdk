@@ -41,16 +41,20 @@ render(
 **Parameters**
 
 - **options** `<object>`: an object holding two key value pairs
-  - **selfhosted** `<boolean | undefined>`: If you want to include the sdk into your bundle (_optional_). Default: `false`
   - **authServer** `<object | undefined>`: an object holding four key value pairs
-    - **apiUri** `<string | undefined>`: the uri of the api of the authetication server (_optional_)
     - **domain** `<string | undefined>`: the domain of the authetication server (_optional_)
+    - **apiUri** `<string | undefined>`: the uri of the api of the authetication server (_optional_)
+    - **paymentUri** `<string | undefined>`: the uri of the payment page of the authetication server (_optional_)
     - **loginUri** `<string | undefined>`: the uri of the login page of the authetication server (_optional_)
     - **sdkUri** `<string | undefined>`: the uri of the SDK of the authetication server (_optional_)
   - **app** `<object>`: an object holding three key value pairs
+    - **refreshType**: `<'silentRefresh' | 'refresh'>`: How to refresh your authorization tokens (_optional_)
+      - *silentRefresh*: uses cookies and an iframe for refreshing the tokens (authServer is required with this option)
+      - *refresh*: uses the localStorage or sessionStorage (only for the refresh token, the access token is only stored in memory) and an HTTP request to refresh the tokens (default value)
     - **origin** `<string>`: the uri of the client application (_required_)
     - **clientId** `<string>`: the UUID of an userdocks application (_required_)
     - **redirectUri** `<string>`: the redirect uri of the userdocks application (_required_)
+
 ## **useUserdocks**
 
 This custom hook returns an object.
@@ -65,7 +69,7 @@ This is a custom hook to get the current userdocks object from a UserdocksProvid
 import { useUserdocks } from '@userdocks/react-sdk';
 
 function MyComponent() {
-  const { isLoading, isAuthenticated, userdocks } = useUserdocks();
+  const { isLoading, initializeToken, isAuthenticated, userdocks } = useUserdocks();
   console.log('Is user authenticated: ', isAuthenticated)
 
   // ...
@@ -76,7 +80,8 @@ function MyComponent() {
 
 - **identity** `<object>`
   - **isLoading** `<boolean>`: indicating if userdocks is ready for usage
-  - **isAuthenticated** `<boolean>`: indicating if the user is autheticated or not
+  - **initializeToken** `<() => Promise<void>>`: stores the token in-memory or refreshes the token and stores it (uses a [web worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) when available)
+  - **isAuthenticated** `<boolean | null>`: indicating if the user is autheticated after the token is initialized (is null if not initialized)
   - **userdocks** `<object | null>`: an object holding the [@userdocks/web-client-sdk](https://github.com/userdocks/web-client-sdk#getuserdocks)
 
 ## **Usage**
@@ -87,7 +92,16 @@ Wrap your app with a `UserdocksProvider`:
 import { UserdocksProvider } from '@userdocks/react-sdk';
 
 const options = {
+  // e.g. if using a cname
+  authServer: {
+    domain: `<domain-of-the-auth-server>`
+    apiUri: '<the-payment-uri-of-your-application>',
+    paymentUri: '<the-payment-uri-of-your-application>',
+    loginUri: '<the-payment-uri-of-your-application>',
+    sdkUri: '<the-payment-uri-of-your-application>',
+  },
   app: {
+    refreshToken: '<refresh> or <silentRefresh>'
     origin: '<the-uri-of-your-application>',
     clientId: '<an-uuid-of-an-application-on-uderdocks>',
     redirectUri: '<the-redirect-uri-of-your-application>',
@@ -117,10 +131,11 @@ const Callback = () => {
       try {
         if (userdocks && !isLoading) {
           const isLoginSuccess = await userdocks.exchangeCodeForToken();
+
           if (isLoginSuccess) {
             history.replace('/autheticated-component');
           } else {
-            userdocks.redirectTo('signIn');
+            userdocks.redirectTo({ type: 'signIn' });
           }
         }
       } catch (e) {
@@ -128,7 +143,7 @@ const Callback = () => {
 
         // handle error or redirect to sign in page
         // if (userdocks) {
-        //   userdocks.redirectTo('signIn');
+        //   userdocks.redirectTo({ type: 'signIn' });
         // }
       }
     })();
@@ -147,23 +162,48 @@ import { useEffect, FC } from 'react';
 import { useHistory } from 'react-router-dom';
 import useUserdocks from '@userdocks/react-sdk';
 
-const options = {
-  app: {
-    origin: '<the-uri-of-your-application>',
-    clientId: '<an-uuid-of-an-application-on-uderdocks>',
-    redirectUri: '<the-redirect-uri-of-your-application>',
-  },
-};
-
 const AnyComponent = () => {
   const { isLoading, isAutheticated, userdocks } = useUserdocks();
   const history = useHistory();
+
+ // Example API Call to your server
+  useEffect(() => {
+    (async () => {
+      if (!isAuthenticated) {
+        await authorize();
+      }
+
+      const token = await userdocks.getToken();
+
+      if (!token.accessToken) {
+        userdocks.redirectTo({
+          type: 'signIn',
+        });
+      }
+
+      if (token.tokenType && token.accessToken) {
+        try {
+          const response = await fetch('https://example.api.com/v1/users', {
+            headers: {
+              'Authorization': `${token.tokenType} ${token.accessToken}`,
+            },
+          });
+
+          const data = await response.json();
+
+          // do something with the data
+        } catch(err) {
+          // handle error
+        }
+      }
+    })();
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return <div>Is Loading...</div>;
   }
 
-  if (!isAutheticated) {
+  if (isAutheticated === false) {
     userdocks.redirectTo('signIn');
 
     return null;

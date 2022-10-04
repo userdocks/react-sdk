@@ -5,7 +5,7 @@ export interface IIdentity {
   isLoading: boolean;
   userdocks: typeof userdocksSdk | null;
   isAuthenticated: boolean | null;
-  authorize: () => Promise<void>;
+  initializeToken: () => Promise<void>;
 }
 
 interface UserdocksProviderProps {
@@ -18,7 +18,7 @@ export const UserdocksContext = createContext<IIdentity>({
   isAuthenticated: null,
   isLoading: true,
   userdocks: null,
-  authorize: () => Promise.resolve(),
+  initializeToken: () => Promise.resolve(),
 });
 
 export const UserdocksConsumer = UserdocksContext.Consumer;
@@ -36,7 +36,7 @@ function UserdocksProvider({
     setUserdocks(userdocksObject);
   };
 
-  const authorize = async () => {
+  const initializeToken = async () => {
     if (!userdocks) {
       return;
     }
@@ -51,31 +51,10 @@ function UserdocksProvider({
       return;
     }
 
-    if (options.selfhosted) {
-      // const userdocksObject = window.userdocks || userdocksSdk;
-
       initializeUserdocks(userdocksSdk);
 
       return;
-    }
-
-    const script = document.createElement('script');
-    const sdkUrl = options?.authServer?.sdkUri || 'https://sdk.userdocks.com';
-
-    script.type = 'text/javascript';
-    script.src = `${sdkUrl}/identity.js`;
-    script.async = true;
-
-    script.onload = async () => {
-      if (!window.userdocks) {
-        return;
-      }
-
-      initializeUserdocks(window.userdocks);
-    };
-
-    document.getElementsByTagName('head')[0].appendChild(script);
-  }, [options.selfhosted, userdocks]);
+  }, [userdocks]);
 
   if (!children) {
     return null;
@@ -87,7 +66,7 @@ function UserdocksProvider({
         isLoading: !userdocks,
         userdocks,
         isAuthenticated,
-        authorize,
+        initializeToken,
       }}
     >
       {children}
