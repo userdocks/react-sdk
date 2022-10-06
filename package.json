@@ -1,6 +1,6 @@
 {
   "name": "@userdocks/react-sdk",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "The React SDK for userdocks. Securly store, access, and refresh access tokens in your React app.",
   "source": "./src/index.ts",
   "main": "./dist/index.js",

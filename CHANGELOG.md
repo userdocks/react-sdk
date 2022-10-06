@@ -1,3 +1,7 @@
+0.6.0 - October, 06 2022
+
+* 91db079 Feat: update UserdocksProvider, setAuth in getToken, init with options (aichbauer)
+
 0.5.1 - October, 04 2022
 
 * 28c1f99 Docs: fix refreshToken to refreshType (aichbauer)
