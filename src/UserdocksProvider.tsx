@@ -2,7 +2,9 @@ import userdocks, { IOptions } from '@userdocks/web-client-sdk';
 import { createContext, PropsWithChildren, useState } from 'react';
 
 export interface IIdentity {
-  userdocks: Omit<typeof userdocks, 'initialize'> & { initialize: () => Promise<void> };
+  userdocks: Omit<typeof userdocks, 'initialize'> & {
+    initialize: () => Promise<void>;
+  };
   isAuthenticated: boolean | null;
 }
 
@@ -23,7 +25,7 @@ function UserdocksProvider({
 }: PropsWithChildren<UserdocksProviderProps>): JSX.Element | null {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-  const getToken: typeof userdocks.getToken = async (tokenOptions) => {
+  const getToken: typeof userdocks.getToken = async tokenOptions => {
     const token = await userdocks.getToken(tokenOptions);
     setIsAuthenticated(!!token?.expiresIn);
 
@@ -32,7 +34,7 @@ function UserdocksProvider({
 
   const initialize = async () => {
     await userdocks.initialize(options);
-  }
+  };
 
   if (!children) {
     return null;
