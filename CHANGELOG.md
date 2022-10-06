@@ -1,3 +1,7 @@
+0.6.1 - October, 06 2022
+
+* c3e5c4f Fix: linting errors (aichbauer)
+
 0.6.0 - October, 06 2022
 
 * 91db079 Feat: update UserdocksProvider, setAuth in getToken, init with options (aichbauer)
