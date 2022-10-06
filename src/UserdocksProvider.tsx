@@ -1,24 +1,18 @@
-import userdocksSdk, { IOptions } from '@userdocks/web-client-sdk';
-import { createContext, PropsWithChildren, useEffect, useState } from 'react';
+import userdocks, { IOptions } from '@userdocks/web-client-sdk';
+import { createContext, PropsWithChildren, useState } from 'react';
 
 export interface IIdentity {
-  isLoading: boolean;
-  userdocks: typeof userdocksSdk | null;
+  userdocks: Omit<typeof userdocks, 'initialize'> & { initialize: () => Promise<void> };
   isAuthenticated: boolean | null;
-  initializeToken: () => Promise<void>;
 }
 
 interface UserdocksProviderProps {
-  options: IOptions & {
-    selfhosted?: boolean;
-  };
+  options: IOptions;
 }
 
 export const UserdocksContext = createContext<IIdentity>({
   isAuthenticated: null,
-  isLoading: true,
-  userdocks: null,
-  initializeToken: () => Promise.resolve(),
+  userdocks,
 });
 
 export const UserdocksConsumer = UserdocksContext.Consumer;
@@ -27,34 +21,18 @@ function UserdocksProvider({
   children,
   options,
 }: PropsWithChildren<UserdocksProviderProps>): JSX.Element | null {
-  const [userdocks, setUserdocks] = useState<typeof userdocksSdk | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
-  const initializeUserdocks = async (userdocksObject: typeof userdocksSdk) => {
-    await userdocksObject.initialize(options);
-
-    setUserdocks(userdocksObject);
-  };
-
-  const initializeToken = async () => {
-    if (!userdocks) {
-      return;
-    }
-
-    const token = await userdocks.getToken({ refresh: true });
-
+  const getToken: typeof userdocks.getToken = async (tokenOptions) => {
+    const token = await userdocks.getToken(tokenOptions);
     setIsAuthenticated(!!token?.expiresIn);
+
+    return token;
   };
 
-  useEffect(() => {
-    if (userdocks) {
-      return;
-    }
-
-      initializeUserdocks(userdocksSdk);
-
-      return;
-  }, [userdocks]);
+  const initialize = async () => {
+    await userdocks.initialize(options);
+  }
 
   if (!children) {
     return null;
@@ -63,10 +41,12 @@ function UserdocksProvider({
   return (
     <UserdocksContext.Provider
       value={{
-        isLoading: !userdocks,
-        userdocks,
+        userdocks: {
+          ...userdocks,
+          initialize,
+          getToken,
+        },
         isAuthenticated,
-        initializeToken,
       }}
     >
       {children}

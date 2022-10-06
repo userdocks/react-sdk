@@ -18,22 +18,20 @@ jest.mock('@userdocks/web-client-sdk', () => ({
 
 const userdocksMock = mocked(userdocks);
 
-describe('useUserdocks with zero expiration time on token', () => {
-  test('should return isAuthenticated to be false, loading to be false and userdocks to be truthy', async () => {
-    const { result, waitForNextUpdate } = renderHook(useUserdocks, {
+describe('useUserdocks', () => {
+  test('should initially return isAuthenticated to be false, loading to be false and userdocks to be truthy', async () => {
+    const { result } = renderHook(useUserdocks, {
       wrapper: ({ children }) => (
         <UserdocksProvider options={options}>{children}</UserdocksProvider>
       ),
     });
 
-    await waitForNextUpdate();
-
-    expect(result.current.isLoading).toBeFalsy();
+    expect(result.current.isAuthenticated).toBeFalsy();
     expect(result.current.isAuthenticated).toBeFalsy();
     expect(result.current.userdocks).toBeTruthy();
   });
 
-  test('should be authenticated with valid expired', async () => {
+  test('should be authenticated, when calling getToken which resolves to a token with a valid expiresIn', async () => {
     userdocksMock.getToken.mockReturnValue(
       Promise.resolve({
         expiresIn: 100,
@@ -44,27 +42,24 @@ describe('useUserdocks with zero expiration time on token', () => {
       })
     );
 
-    const { result, waitForNextUpdate } = renderHook(useUserdocks, {
+    const { result } = renderHook(useUserdocks, {
       wrapper: ({ children }) => (
         <UserdocksProvider options={options}>{children}</UserdocksProvider>
       ),
     });
 
-    await waitForNextUpdate();
-
     await act(async () => {
-      await result.current.initializeToken();
+      await result.current.userdocks.getToken();
     });
 
-    expect(result.current.isLoading).toBeFalsy();
     expect(result.current.isAuthenticated).toBeTruthy();
     expect(result.current.userdocks).toBeTruthy();
   });
 
-  test('should allow manual refresh', async () => {
+  test('should not be authenticated, when calling getToken which resolves to a token with an invalid expiresIn', async () => {
     userdocksMock.getToken.mockReturnValue(
       Promise.resolve({
-        expiresIn: 100,
+        expiresIn: 0,
         accessToken: null,
         idToken: null,
         redirectUri: null,
@@ -72,21 +67,17 @@ describe('useUserdocks with zero expiration time on token', () => {
       })
     );
 
-  const { result, waitForNextUpdate } = renderHook(useUserdocks, {
-    wrapper: ({ children }) => (
-      <UserdocksProvider options={options}>{children}</UserdocksProvider>
-    ),
-  });
+    const { result } = renderHook(useUserdocks, {
+      wrapper: ({ children }) => (
+        <UserdocksProvider options={options}>{children}</UserdocksProvider>
+      ),
+    });
 
-  await waitForNextUpdate();
+    await act(async () => {
+      await result.current.userdocks.getToken();
+    });
 
-  await act(async () => {
-    await result.current.initializeToken();
-  });
-
-
-    expect(result.current.isLoading).toBeFalsy();
-    expect(result.current.isAuthenticated).toBeTruthy();
+    expect(result.current.isAuthenticated).toBeFalsy();
     expect(result.current.userdocks).toBeTruthy();
   });
 });

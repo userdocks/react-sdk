@@ -69,7 +69,7 @@ This is a custom hook to get the current userdocks object from a UserdocksProvid
 import { useUserdocks } from '@userdocks/react-sdk';
 
 function MyComponent() {
-  const { isLoading, initializeToken, isAuthenticated, userdocks } = useUserdocks();
+  const { isAuthenticated, userdocks } = useUserdocks();
   console.log('Is user authenticated: ', isAuthenticated)
 
   // ...
@@ -79,8 +79,6 @@ function MyComponent() {
 **Return Value**
 
 - **identity** `<object>`
-  - **isLoading** `<boolean>`: indicating if userdocks is ready for usage
-  - **initializeToken** `<() => Promise<void>>`: stores the token in-memory or refreshes the token and stores it (uses a [web worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers) when available)
   - **isAuthenticated** `<boolean | null>`: indicating if the user is autheticated after the token is initialized (is null if not initialized)
   - **userdocks** `<object | null>`: an object holding the [@userdocks/web-client-sdk](https://github.com/userdocks/web-client-sdk#getuserdocks)
 
@@ -123,20 +121,26 @@ import { useHistory } from 'react-router-dom';
 import { useUserdocks } from '@userdocks/react-sdk';
 
 const Callback = () => {
-  const { isLoading, userdocks } = useUserdocks();
+  const { is, userdocks } = useUserdocks();
   const history = useHistory();
 
   useEffect(() => {
     (async () => {
       try {
-        if (userdocks && !isLoading) {
-          const isLoginSuccess = await userdocks.exchangeCodeForToken();
+        // its better to initialize userdocks way up the tree
+        // e.g. once in your App Component
+        // userdocks should only be initialized once
+        if (!isInitialized()) {
+          await userdocks.initialize();
+        }
 
-          if (isLoginSuccess) {
-            history.replace('/autheticated-component');
-          } else {
-            userdocks.redirectTo({ type: 'signIn' });
-          }
+        // for a exchange we do not need to check if it isAuthenticated
+        const isLoginSuccess = await userdocks.exchangeCodeForToken();
+
+        if (isLoginSuccess) {
+          history.replace('/autheticated-component');
+        } else {
+          userdocks.redirectTo({ type: 'signIn' });
         }
       } catch (e) {
         console.error(e);
@@ -163,21 +167,24 @@ import { useHistory } from 'react-router-dom';
 import useUserdocks from '@userdocks/react-sdk';
 
 const AnyComponent = () => {
-  const { isLoading, isAutheticated, userdocks } = useUserdocks();
+  const { isAuthenticated, userdocks } = useUserdocks();
   const history = useHistory();
 
  // Example API Call to your server
   useEffect(() => {
     (async () => {
-      if (!isAuthenticated) {
-        await authorize();
+      // its better to initialize userdocks way up the tree
+      // e.g. once in your App Component
+      // userdocks should only be initialized once
+      if (!isInitialized()) {
+        await userdocks.initialize();
       }
 
-      const token = await userdocks.getToken();
+      const token = await userdocks.getToken({ refresh: true });
 
       if (!token.accessToken) {
         userdocks.redirectTo({
-          type: 'signIn',
+          type: 'unauthenticated',
         });
       }
 
@@ -199,12 +206,10 @@ const AnyComponent = () => {
     })();
   }, [isAuthenticated]);
 
-  if (isLoading) {
-    return <div>Is Loading...</div>;
-  }
-
-  if (isAutheticated === false) {
-    userdocks.redirectTo('signIn');
+  if (userdocks.isInitialized() && isAuthenticated === false) {
+    userdocks.redirectTo({
+      type: 'unauthenticated',
+    });
 
     return null;
   }
