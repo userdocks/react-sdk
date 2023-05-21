@@ -1,7 +1,7 @@
 # **@userdocks/react-sdk**
 
 ![npm](https://img.shields.io/npm/v/@userdocks/react-sdk?style=flat-square)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/userdocks/react-sdk/build?style=flat-square)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/userdocks/react-sdk/ci.yml?style=flat-square)
 ![Coveralls branch](https://img.shields.io/coveralls/github/userdocks/react-sdk/main?style=flat-square)
 ![NPM](https://img.shields.io/npm/l/@userdocks/react-sdk?style=flat-square)
 
