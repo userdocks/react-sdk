@@ -1,3 +1,9 @@
+0.7.0 - January, 25 2025
+
+* acccaf0 Feat: move to vitest | wait 1 second before actually getting the token (JPeer264)
+* 110082a Docs: update build badge url (aichbauer)
+* f942567 CI: update node versions (aichbauer)
+
 0.6.1 - October, 06 2022
 
 * c3e5c4f Fix: linting errors (aichbauer)
