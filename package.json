@@ -9,7 +9,7 @@
   "private": false,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.tsx .",
-    "test": "jest --coverage",
+    "test": "vitest run . --coverage --coverage.reporter lcov",
     "build": "rm -rf dist && parcel build",
     "watch": "parcel watch",
     "cleanup": "rm -rf ./node_modules && rm -rf ./dist && rm -rf ./.parcel-cache && rm -rf ./.cache && npm i",
@@ -35,11 +35,11 @@
     "@parcel/packager-ts": "^2.4.1",
     "@parcel/transformer-typescript-types": "^2.4.1",
     "@testing-library/react-hooks": "^7.0.2",
-    "@types/jest": "^27.4.0",
     "@types/react": "17.0.2",
     "@typescript-eslint/eslint-plugin": "^5.9.0",
     "@typescript-eslint/parser": "^5.9.0",
-    "@userdocks/web-client-sdk": "^0.5.2",
+    "@userdocks/web-client-sdk": "^0.13.0",
+    "@vitest/coverage-v8": "^3.0.4",
     "eslint": "^8.6.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
@@ -50,9 +50,8 @@
     "prettier": "^2.5.1",
     "react": "^17.0.2",
     "react-test-renderer": "^17.0.2",
-    "ts-jest": "^27.1.2",
-    "ts-loader": "^9.2.6",
-    "typescript": "^4.5.5"
+    "typescript": "^4.5.5",
+    "vitest": "^3.0.4"
   },
   "peerDependencies": {
     "@userdocks/web-client-sdk": ">= 0.9.0",
