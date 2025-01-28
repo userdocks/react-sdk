@@ -1,3 +1,8 @@
+0.7.1 - January, 28 2025
+
+* bc67f9b Fix: make userdocks object stable (JPeer264)
+* a476921 Chore: update github action (JPeer264)
+
 0.7.0 - January, 25 2025
 
 * acccaf0 Feat: move to vitest | wait 1 second before actually getting the token (JPeer264)
