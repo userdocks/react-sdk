@@ -1,5 +1,11 @@
 import userdocks, { IOptions } from '@userdocks/web-client-sdk';
-import { createContext, PropsWithChildren, useCallback, useState } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 
 export interface IIdentity {
   userdocks: Omit<typeof userdocks, 'initialize'> & {
@@ -59,14 +65,19 @@ function UserdocksProvider({
     await userdocks.initialize(options);
   }, []);
 
+  const userdocksResult = useMemo(
+    () => ({
+      ...userdocks,
+      initialize,
+      getToken,
+    }),
+    [initialize, getToken]
+  );
+
   return (
     <UserdocksContext.Provider
       value={{
-        userdocks: {
-          ...userdocks,
-          initialize,
-          getToken,
-        },
+        userdocks: userdocksResult,
         isAuthenticated,
       }}
     >
