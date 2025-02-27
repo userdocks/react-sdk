@@ -1,3 +1,7 @@
+0.7.2 - February, 27 2025
+
+* 9ecf7e1 Chore: upgrade web-client-sdk (aichbauer)
+
 0.7.1 - January, 28 2025
 
 * bc67f9b Fix: make userdocks object stable (JPeer264)
