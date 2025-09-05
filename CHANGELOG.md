@@ -1,3 +1,7 @@
+0.7.3 - September, 05 2025
+
+* 29d4438 Fix: correct peerDependency notation (Jan Peer Stöcklmair)
+
 0.7.2 - February, 27 2025
 
 * 9ecf7e1 Chore: upgrade web-client-sdk (aichbauer)
