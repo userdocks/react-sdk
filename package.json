@@ -54,7 +54,7 @@
     "vitest": "^3.0.4"
   },
   "peerDependencies": {
-    "@userdocks/web-client-sdk": "^0.15.0",
+    "@userdocks/web-client-sdk": ">= 0.15.0",
     "react": ">= 16.8.0"
   }
 }
